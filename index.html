@@ -14,7 +14,6 @@
 <meta name="twitter:title" content="ブロックス">
 <meta name="twitter:description" content="2〜4人で遊べるボードゲーム">
 <meta name="twitter:image" content="https://toku031903-sys.github.io/blocks-/IMG_0777.jpeg">
-
 <title>BLOKUS ONLINE</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
@@ -49,7 +48,7 @@
   .player-slots{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:360px;margin:20px 0}
   .slot{border-radius:8px;padding:14px 16px;transition:all .3s}
 
-  /* ORDER PICKER (host only) */
+  /* ORDER PICKER */
   #order-picker{display:none;width:100%;max-width:360px;margin:0 0 16px;animation:popIn .2s ease}
   .order-title{color:#555;font-size:0.65rem;letter-spacing:3px;margin-bottom:10px;text-align:center}
   .order-slots{display:flex;flex-direction:column;gap:8px}
@@ -63,40 +62,47 @@
   .order-rand:active{background:#ffb80011}
 
   /* GAME SCREEN */
-  #game-screen{padding:0;justify-content:flex-start;gap:0;overflow:hidden}
+  #game-screen{padding:0;justify-content:flex-start;gap:0;overflow:hidden;height:100vh;height:100dvh}
 
   /* Top bar */
   .game-topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;width:100%;background:#09090f;border-bottom:1px solid #1a1a2a;flex-shrink:0}
   .topbar-logo{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;letter-spacing:-0.5px;background:linear-gradient(90deg,#ff3c6f,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-  .turn-chips{display:flex;gap:6px}
+  .turn-chips{display:flex;gap:6px;flex-wrap:wrap}
   .turn-chip{padding:4px 8px;border-radius:20px;font-size:0.6rem;letter-spacing:1.5px;font-weight:700;border:1px solid transparent;transition:all .3s}
 
-  /* Board area — scrollable */
-  .board-area{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:10px;-webkit-overflow-scrolling:touch}
-  #board{display:grid;grid-template-columns:repeat(20,1fr);gap:1px;background:#1a1a2a;padding:1px;border-radius:6px;border:1px solid #2a2a3a;flex-shrink:0}
-  .cell{width:clamp(15px,4vw,22px);height:clamp(15px,4vw,22px);transition:background .06s}
+  /* Board area */
+  .board-area{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:8px;-webkit-overflow-scrolling:touch;min-height:0}
+  #board{display:grid;grid-template-columns:repeat(20,1fr);gap:1px;background:#1a1a2a;padding:1px;border-radius:6px;border:1px solid #2a2a3a;flex-shrink:0;touch-action:none}
+  .cell{width:clamp(15px,4.2vw,22px);height:clamp(15px,4.2vw,22px);transition:background .06s}
 
-  /* Bottom tray */
-  .game-bottom{flex-shrink:0;background:#0d0d15;border-top:1px solid #1a1a2a;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
-  .tray-header{display:flex;align-items:center;justify-content:space-between}
-  .tray-label{font-size:0.65rem;letter-spacing:2px}
-  .tray-controls{display:flex;gap:6px}
-  .tray-btn{font-size:0.7rem;letter-spacing:1.5px;font-weight:700;padding:8px 14px;background:transparent;color:#aaa;border:1px solid #2a2a3a;border-radius:20px;min-height:36px}
-  .tray-btn:active{background:#1a1a2a}
-  .tray-btn.skip{color:#ffb800;border-color:#ffb80066}
-  .tray-btn.skip:active{background:#ffb80011}
-  .piece-tray{display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;padding:4px 2px 8px;-webkit-overflow-scrolling:touch}
-  .piece-tray::-webkit-scrollbar{height:3px}
+  /* Bottom area */
+  .game-bottom{flex-shrink:0;background:#0d0d15;border-top:1px solid #1a1a2a;display:flex;flex-direction:column}
+
+  /* Rotate/Flip bar — above tray, always visible on my turn */
+  .transform-bar{display:none;gap:8px;padding:10px 12px 0;justify-content:center}
+  .transform-bar.visible{display:flex}
+  .tf-btn{flex:1;max-width:120px;font-size:0.75rem;letter-spacing:1.5px;font-weight:700;padding:10px 8px;background:#161622;color:#aaa;border:1px solid #2a2a3a;border-radius:10px;min-height:44px;transition:all .15s}
+  .tf-btn:active{background:#222233;transform:scale(0.96)}
+  .tf-btn.skip{color:#ffb800;border-color:#ffb80044;background:#161410}
+  .tf-btn.skip:active{background:#201a08}
+
+  /* Tray */
+  .tray-header{display:flex;align-items:center;justify-content:space-between;padding:8px 12px 4px}
+  .tray-label{font-size:0.6rem;letter-spacing:2px}
+  .piece-tray{display:flex;flex-wrap:wrap;gap:6px;overflow-y:auto;padding:4px 12px 10px;max-height:160px;-webkit-overflow-scrolling:touch}
+  .piece-tray::-webkit-scrollbar{width:3px}
   .piece-tray::-webkit-scrollbar-track{background:#111}
   .piece-tray::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
-  .piece-mini{padding:4px;border:1.5px solid transparent;border-radius:6px;flex-shrink:0;transition:all .15s}
+  .piece-mini{padding:5px;border:1.5px solid transparent;border-radius:6px;flex-shrink:0;transition:all .15s;touch-action:none;user-select:none}
   .piece-mini.used{opacity:0.15;pointer-events:none}
   .piece-mini.selected{background:#ffffff10}
   .piece-mini:active:not(.used){transform:scale(0.95)}
-  .waiting-msg{font-size:0.7rem;letter-spacing:2px;color:#444;padding:16px 0;text-align:center}
 
   /* END SCREEN */
   .score-row{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-radius:8px}
+
+  /* Drag ghost */
+  #drag-ghost{position:fixed;pointer-events:none;z-index:1000;opacity:0.85;display:none;transform:translate(-50%,-50%)}
 </style>
 </head>
 <body>
@@ -134,14 +140,11 @@
     <button class="neon-btn" style="color:#555;border:1px solid #555;padding:12px 16px;font-size:0.7rem;margin-top:0" onclick="copyCode()" id="copy-btn">COPY</button>
   </div>
   <div class="player-slots" id="player-slots"></div>
-
-  <!-- ORDER PICKER (host only, shown after all ready) -->
   <div id="order-picker">
     <div class="order-title">TURN ORDER</div>
     <div class="order-slots" id="order-slots"></div>
     <button class="order-rand" onclick="randomizeOrder()">&#9672; RANDOMIZE</button>
   </div>
-
   <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
     <button class="neon-btn" style="color:#39ff6b;border:1px solid #39ff6b" id="btn-ready" onclick="setReady()">READY</button>
     <button class="neon-btn" style="color:#ff3c6f;border:1px solid #ff3c6f;display:none" id="btn-start" onclick="startGame()">START GAME</button>
@@ -151,27 +154,23 @@
 
 <!-- GAME -->
 <div id="game-screen" class="screen">
-  <!-- Top bar -->
   <div class="game-topbar">
     <div class="topbar-logo">BLOKUS</div>
     <div class="turn-chips" id="turn-chips"></div>
     <div id="turn-label" style="font-size:0.6rem;letter-spacing:1.5px;color:#444;min-width:60px;text-align:right"></div>
   </div>
-
-  <!-- Board -->
   <div class="board-area">
     <div id="board"></div>
   </div>
-
-  <!-- Bottom tray: my pieces + controls -->
   <div class="game-bottom">
+    <!-- Rotate / Flip / Skip bar -->
+    <div class="transform-bar" id="transform-bar">
+      <button class="tf-btn" onclick="doRotate()">&#8635; ROTATE</button>
+      <button class="tf-btn" onclick="doFlip()">&#10234; FLIP</button>
+      <button class="tf-btn skip" onclick="doSkip()">SKIP</button>
+    </div>
     <div class="tray-header">
       <div class="tray-label" id="tray-label" style="color:#aaa"></div>
-      <div class="tray-controls" id="tray-controls" style="display:none">
-        <button class="tray-btn" onclick="doRotate()">&#8635; ROT</button>
-        <button class="tray-btn" onclick="doFlip()">&#10234; FLIP</button>
-        <button class="tray-btn skip" onclick="doSkip()">SKIP</button>
-      </div>
     </div>
     <div class="piece-tray" id="piece-tray"></div>
   </div>
@@ -184,6 +183,9 @@
   <div id="final-scores" style="display:flex;flex-direction:column;gap:8px;width:100%;max-width:320px;margin-bottom:32px"></div>
   <button class="neon-btn" style="color:#ff3c6f;border:1px solid #ff3c6f" onclick="restartGame()">PLAY AGAIN</button>
 </div>
+
+<!-- Drag ghost SVG overlay -->
+<div id="drag-ghost"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -205,7 +207,6 @@ const db  = getDatabase(app);
 // ── CONSTANTS ────────────────────────────────────────────────────────────────
 const NEON    = ['#ff3c6f','#00d4ff','#39ff6b','#ffb800'];
 const LABELS  = ['P1','P2','P3','P4'];
-// Default corners by seat index (before order remapping, corner = seat index)
 const CORNERS = [[0,0],[0,19],[19,19],[19,0]];
 const BS = 20;
 
@@ -251,8 +252,6 @@ function getVariants(shape){
   return res;
 }
 
-// pIdx here is the turn-order index (0=first player, 1=second, etc.)
-// Corner is assigned by turn-order index
 function isValidPlacement(board,shape,r,c,turnIdx,firstMove){
   for(const [dr,dc] of shape){
     const tr=r+dr,tc=c+dc;
@@ -306,13 +305,11 @@ function serializePieces(pieces){return pieces.map(pp=>pp.map(p=>({shape:p.shape
 function deserializePieces(raw){return raw.map(pp=>pp.map(p=>({shape:p.shape.split(';').map(s=>s.split(',').map(Number)),used:p.used})));}
 
 // ── APP STATE ────────────────────────────────────────────────────────────────
-let roomId=null, mySlot=null; // mySlot = seat index in players array
-let roomListener=null, stateListener=null;
-let gameState=null; // {board,pieces,currentTurnIdx,passed,ended,order}
-// order: [seatIdx0, seatIdx1, seatIdx2, seatIdx3] — who plays in turn 0,1,2,3
-// myTurnIdx = order.indexOf(mySlot)
-let selPiece=null, hoverCell=null, isProcessing=false;
-let pendingOrder=null; // host's draft order before starting
+let roomId=null,mySlot=null;
+let roomListener=null,stateListener=null;
+let gameState=null;
+let selPiece=null,isProcessing=false;
+let pendingOrder=null;
 
 // ── SCREEN ───────────────────────────────────────────────────────────────────
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
@@ -381,16 +378,14 @@ function renderWaiting(r){
 
   document.getElementById('btn-ready').style.display=r.players[mySlot]?.ready?'none':'block';
 
-  const allReady=r.players.every(p=>p.ready);
   const filledPlayers=r.players.filter(p=>p.name);
   const enough=filledPlayers.length>=2;
   const isHost=mySlot===0;
-
-  // Show order picker to host when all ready
   const picker=document.getElementById('order-picker');
-  if(isHost&&allReady&&enough){
+  if(isHost&&enough){
     picker.style.display='block';
-    if(!pendingOrder) pendingOrder=filledPlayers.map((_,i)=>i); // default order = join order
+    const filledIndices=r.players.map((_,i)=>i).filter(i=>r.players[i].name);
+    if(!pendingOrder||pendingOrder.length!==filledIndices.length) pendingOrder=[...filledIndices];
     renderOrderPicker(r.players);
     document.getElementById('btn-start').style.display='block';
   } else {
@@ -422,17 +417,7 @@ window.moveOrder=(pos,dir)=>{
   const newPos=pos+dir;
   if(newPos<0||newPos>=pendingOrder.length) return;
   [pendingOrder[pos],pendingOrder[newPos]]=[pendingOrder[newPos],pendingOrder[pos]];
-  // need current players — re-fetch from DOM or re-render
-  const slots=document.getElementById('player-slots').querySelectorAll('.slot');
-  const players=Array.from(slots).map(s=>{
-    const name=s.querySelectorAll('div')[1].textContent;
-    return {name:name==='WAITING...'?'':name};
-  });
-  renderOrderPicker(players.map((p,i)=>({...p,name:p.name}))); // simplified re-render
-  // Actually just re-fetch from Firebase
-  get(ref(db,`rooms/${roomId}/players`)).then(snap=>{
-    if(snap.exists()) renderOrderPicker(snap.val());
-  });
+  get(ref(db,`rooms/${roomId}/players`)).then(snap=>{if(snap.exists()) renderOrderPicker(snap.val());});
 }
 
 window.randomizeOrder=async()=>{
@@ -458,10 +443,8 @@ window.startGame=async()=>{
   const snap=await get(ref(db,`rooms/${roomId}/players`));
   if(!snap.exists()) return;
   const players=snap.val();
-  // pad order to 4 (unfilled seats are excluded, pad with -1 as sentinel)
   const filled=players.map((_,i)=>i).filter(i=>players[i].name);
   const order=pendingOrder&&pendingOrder.length===filled.length?pendingOrder:filled;
-  // Pad to length 4 with -1 for empty seats
   const fullOrder=[...order,...[-1,-1,-1,-1]].slice(0,4);
   const gs={
     board:flattenBoard(initBoard()),
@@ -495,18 +478,20 @@ function listenGameState(){
   });
 }
 
-// myTurnIdx: which turn-order position I am
-function getMyTurnIdx(){
-  if(!gameState) return -1;
-  return gameState.order.indexOf(mySlot);
-}
+function getMyTurnIdx(){if(!gameState) return -1;return gameState.order.indexOf(mySlot);}
 
 // ── GAME ─────────────────────────────────────────────────────────────────────
 function enterGame(){
-  selPiece=null;hoverCell=null;
+  selPiece=null;
   showScreen('game-screen');
   buildBoard();
   renderGame();
+}
+
+// ── CELL SIZE (for drag positioning) ─────────────────────────────────────────
+function getCellSize(){
+  const el=document.getElementById('board').children[0];
+  return el?el.getBoundingClientRect().width:18;
 }
 
 function buildBoard(){
@@ -519,11 +504,6 @@ function buildBoard(){
       cell.dataset.r=r;cell.dataset.c=c;
       cell.style.borderTop=`1px solid ${r%5===0?'#242438':'#16162a'}`;
       cell.style.borderLeft=`1px solid ${c%5===0?'#242438':'#16162a'}`;
-      // Touch support
-      cell.addEventListener('touchstart',onCellTouch,{passive:true});
-      cell.addEventListener('mouseenter',onCellEnter);
-      cell.addEventListener('mouseleave',onCellLeave);
-      cell.addEventListener('click',onCellClick);
       boardEl.appendChild(cell);
     }
   }
@@ -531,21 +511,41 @@ function buildBoard(){
 
 function cellEl(r,c){return document.getElementById('board').children[r*BS+c];}
 
+// ── RENDER ────────────────────────────────────────────────────────────────────
 function renderGame(){
   if(!gameState) return;
   const {board,pieces,currentTurnIdx,passed,order}=gameState;
   const myTurnIdx=getMyTurnIdx();
-  const isMyTurn=currentTurnIdx===myTurnIdx&&!passed[myTurnIdx];
+  const isMyTurn=currentTurnIdx===myTurnIdx&&myTurnIdx>=0&&!passed[myTurnIdx];
 
-  // Board
+  // Board cells + corner markers
   for(let r=0;r<BS;r++) for(let c=0;c<BS;c++){
     const el=cellEl(r,c);
     const v=board[r][c];
-    el.style.background=v>0?NEON[v-1]:'#12121e';
-    el.style.boxShadow=v>0?`inset 0 0 0 1px ${NEON[v-1]}33`:'none';
+    if(v>0){
+      // placed piece — use exact same NEON color as tray
+      const turnIdx=v-1;
+      const seatIdx=order[turnIdx];
+      el.style.background=seatIdx>=0?NEON[seatIdx]:NEON[turnIdx];
+      el.style.boxShadow=`inset 0 0 0 1px ${el.style.background}33`;
+    } else {
+      // check if this is a corner start cell
+      let cornerColor=null;
+      order.filter(s=>s>=0).forEach((seatIdx,ti)=>{
+        const [cr,cc]=CORNERS[ti];
+        if(r===cr&&c===cc&&board[r][c]===0) cornerColor=NEON[seatIdx];
+      });
+      if(cornerColor){
+        el.style.background=cornerColor+'44';
+        el.style.boxShadow=`inset 0 0 0 1.5px ${cornerColor}88`;
+      } else {
+        el.style.background='#12121e';
+        el.style.boxShadow='none';
+      }
+    }
   }
 
-  // Turn chips — show by turn order
+  // Turn chips
   const chips=document.getElementById('turn-chips');
   chips.innerHTML='';
   order.filter(s=>s>=0).forEach((seatIdx,turnPos)=>{
@@ -560,17 +560,17 @@ function renderGame(){
   document.getElementById('turn-label').textContent=isMyTurn?'YOUR TURN':'WAIT...';
   document.getElementById('turn-label').style.color=isMyTurn?NEON[mySlot]:'#444';
 
-  // Bottom tray — my pieces only
+  // Transform bar visibility
+  document.getElementById('transform-bar').classList.toggle('visible',isMyTurn);
+
   renderMyTray(pieces,myTurnIdx,isMyTurn);
 }
 
 function renderMyTray(pieces,myTurnIdx,isMyTurn){
   const tray=document.getElementById('piece-tray');
   tray.innerHTML='';
-  document.getElementById('tray-controls').style.display=isMyTurn?'flex':'none';
 
   if(myTurnIdx===-1){
-    // spectator
     document.getElementById('tray-label').textContent='SPECTATING';
     document.getElementById('tray-label').style.color='#444';
     return;
@@ -581,12 +581,12 @@ function renderMyTray(pieces,myTurnIdx,isMyTurn){
 
   if(!isMyTurn){
     document.getElementById('tray-label').textContent='WAITING FOR YOUR TURN...';
-    // still show pieces (greyed)
   } else {
     const remaining=pieces[myTurnIdx].reduce((s,p)=>s+(p.used?0:p.shape.length),0);
     document.getElementById('tray-label').textContent=`YOUR PIECES — ${remaining} SQ LEFT`;
   }
 
+  // Show ALL pieces (used ones are greyed via .used class)
   pieces[myTurnIdx].forEach((p,pi)=>{
     const mini=buildPieceMini(pi,p,color,isMyTurn);
     tray.appendChild(mini);
@@ -594,7 +594,7 @@ function renderMyTray(pieces,myTurnIdx,isMyTurn){
 }
 
 function buildPieceMini(pi,p,color,isMyTurn){
-  const CELL=10;
+  const CELL=11;
   const shape=(selPiece&&selPiece.pieceIdx===pi)?selPiece.shape:p.shape;
   const rows=Math.max(...shape.map(c=>c[0]))+1;
   const cols=Math.max(...shape.map(c=>c[1]))+1;
@@ -605,6 +605,24 @@ function buildPieceMini(pi,p,color,isMyTurn){
   div.style.boxShadow=isSel?`0 0 8px ${color}55`:'none';
   if(isSel) div.classList.add('selected');
 
+  const svg=makePieceSVG(shape,color,CELL,!isMyTurn||p.used,isSel);
+  div.appendChild(svg);
+
+  if(isMyTurn&&!p.used){
+    // Tap to select
+    div.addEventListener('click',()=>{
+      selPiece=(selPiece&&selPiece.pieceIdx===pi)?null:{pieceIdx:pi,shape:deepCopy(p.shape)};
+      renderMyTray(gameState.pieces,getMyTurnIdx(),true);
+    });
+    // Drag to place
+    setupDrag(div,pi,p,color,CELL);
+  }
+  return div;
+}
+
+function makePieceSVG(shape,color,CELL,dimmed,glowing){
+  const rows=Math.max(...shape.map(c=>c[0]))+1;
+  const cols=Math.max(...shape.map(c=>c[1]))+1;
   const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
   svg.setAttribute('width',cols*CELL+2);
   svg.setAttribute('height',rows*CELL+2);
@@ -612,116 +630,190 @@ function buildPieceMini(pi,p,color,isMyTurn){
     const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
     rect.setAttribute('x',c*CELL+1);rect.setAttribute('y',r*CELL+1);
     rect.setAttribute('width',CELL-1);rect.setAttribute('height',CELL-1);
-    rect.setAttribute('fill',!isMyTurn||p.used?'#333':color);rect.setAttribute('rx',2);
-    if(isSel) rect.style.filter=`drop-shadow(0 0 3px ${color})`;
+    rect.setAttribute('fill',dimmed?'#333':color);
+    rect.setAttribute('rx',2);
+    if(glowing) rect.style.filter=`drop-shadow(0 0 3px ${color})`;
     svg.appendChild(rect);
   });
-  div.appendChild(svg);
-
-  if(isMyTurn&&!p.used){
-    div.addEventListener('click',()=>{
-      selPiece=(selPiece&&selPiece.pieceIdx===pi)?null:{pieceIdx:pi,shape:deepCopy(p.shape)};
-      renderMyTray(gameState.pieces,getMyTurnIdx(),true);
-    });
-  }
-  return div;
+  return svg;
 }
 
-// ── BOARD INTERACTION ────────────────────────────────────────────────────────
-function getPreview(r,c){if(!selPiece) return null;return selPiece.shape.map(([dr,dc])=>[r+dr,c+dc]);}
+// ── DRAG TO PLACE ─────────────────────────────────────────────────────────────
+const ghost=document.getElementById('drag-ghost');
+let dragPi=null,dragShape=null,dragColor=null;
 
-function clearPreviewHighlight(r,c){
-  getPreview(r,c)?.forEach(([pr,pc])=>{
-    if(pr<0||pr>=BS||pc<0||pc>=BS) return;
-    const v=gameState.board[pr][pc];
-    cellEl(pr,pc).style.background=v>0?NEON[v-1]:'#12121e';
-  });
+function setupDrag(div,pi,p,color,CELL){
+  div.addEventListener('touchstart',e=>{
+    e.stopPropagation();
+    // select piece on touch start
+    selPiece={pieceIdx:pi,shape:deepCopy(p.shape)};
+    dragPi=pi;dragShape=selPiece.shape;dragColor=color;
+    renderMyTray(gameState.pieces,getMyTurnIdx(),true);
+    showGhost(e.touches[0].clientX,e.touches[0].clientY);
+  },{passive:true});
+
+  div.addEventListener('touchmove',e=>{
+    e.preventDefault();
+    const t=e.touches[0];
+    showGhost(t.clientX,t.clientY);
+    highlightBoardAt(t.clientX,t.clientY);
+  },{passive:false});
+
+  div.addEventListener('touchend',e=>{
+    const t=e.changedTouches[0];
+    ghost.style.display='none';
+    clearBoardPreview();
+    dropAt(t.clientX,t.clientY);
+  },{passive:true});
 }
 
-function onCellEnter(e){
-  if(!selPiece||!gameState||gameState.currentTurnIdx!==getMyTurnIdx()) return;
-  const r=+e.target.dataset.r,c=+e.target.dataset.c;
-  hoverCell=[r,c];
+function showGhost(x,y){
+  if(!selPiece) return;
+  const CELL=getCellSize();
+  const svg=makePieceSVG(selPiece.shape,dragColor||NEON[mySlot],CELL,false,true);
+  ghost.innerHTML='';
+  ghost.appendChild(svg);
+  ghost.style.display='block';
+  ghost.style.left=x+'px';
+  ghost.style.top=y+'px';
+}
+
+function getBoardCellAt(x,y){
+  // find which cell is under coordinates
+  const boardEl=document.getElementById('board');
+  const rect=boardEl.getBoundingClientRect();
+  const cellSize=getCellSize();
+  const gap=1;
+  const step=cellSize+gap;
+  const c=Math.floor((x-rect.left-1)/step);
+  const r=Math.floor((y-rect.top-1)/step);
+  return [r,c];
+}
+
+let lastPreviewRC=null;
+function highlightBoardAt(x,y){
+  const [r,c]=getBoardCellAt(x,y);
+  if(lastPreviewRC&&lastPreviewRC[0]===r&&lastPreviewRC[1]===c) return;
+  clearBoardPreview();
+  if(!selPiece||!gameState) return;
   const myTurnIdx=getMyTurnIdx();
   const firstMove=gameState.pieces[myTurnIdx].every(p=>!p.used);
   const valid=isValidPlacement(gameState.board,selPiece.shape,r,c,myTurnIdx,firstMove);
-  getPreview(r,c)?.forEach(([pr,pc])=>{
-    if(pr<0||pr>=BS||pc<0||pc>=BS) return;
-    if(gameState.board[pr][pc]===0) cellEl(pr,pc).style.background=valid?'rgba(255,255,255,0.22)':'rgba(255,50,50,0.3)';
+  selPiece.shape.forEach(([dr,dc])=>{
+    const tr=r+dr,tc=c+dc;
+    if(tr<0||tr>=BS||tc<0||tc>=BS) return;
+    if(gameState.board[tr][tc]===0)
+      cellEl(tr,tc).style.background=valid?'rgba(255,255,255,0.25)':'rgba(255,50,50,0.3)';
   });
+  lastPreviewRC=[r,c];
 }
 
-function onCellLeave(e){
-  if(!selPiece||!hoverCell) return;
-  clearPreviewHighlight(...hoverCell);
-  hoverCell=null;
+function clearBoardPreview(){
+  if(!lastPreviewRC||!gameState) return;
+  const [r,c]=lastPreviewRC;
+  if(selPiece) selPiece.shape.forEach(([dr,dc])=>{
+    const tr=r+dr,tc=c+dc;
+    if(tr<0||tr>=BS||tc<0||tc>=BS) return;
+    const v=gameState.board[tr][tc];
+    const {order}=gameState;
+    if(v>0){
+      const seatIdx=order[v-1];
+      cellEl(tr,tc).style.background=seatIdx>=0?NEON[seatIdx]:NEON[v-1];
+    } else {
+      let cornerColor=null;
+      order.filter(s=>s>=0).forEach((seatIdx,ti)=>{
+        const [cr2,cc2]=CORNERS[ti];
+        if(tr===cr2&&tc===cc2) cornerColor=NEON[seatIdx];
+      });
+      cellEl(tr,tc).style.background=cornerColor?cornerColor+'44':'#12121e';
+    }
+  });
+  lastPreviewRC=null;
 }
 
-// Touch: tap once to preview, tap again to place
-let touchPreviewCell=null;
-function onCellTouch(e){
-  if(!selPiece||!gameState) return;
-  const myTurnIdx=getMyTurnIdx();
-  if(gameState.currentTurnIdx!==myTurnIdx||gameState.passed[myTurnIdx]) return;
-  const r=+e.target.dataset.r,c=+e.target.dataset.c;
-  if(touchPreviewCell&&touchPreviewCell[0]===r&&touchPreviewCell[1]===c){
-    // second tap = place
-    onCellClick(e);
-    touchPreviewCell=null;
-  } else {
-    if(touchPreviewCell) clearPreviewHighlight(...touchPreviewCell);
-    touchPreviewCell=[r,c];
-    hoverCell=[r,c];
-    const firstMove=gameState.pieces[myTurnIdx].every(p=>!p.used);
-    const valid=isValidPlacement(gameState.board,selPiece.shape,r,c,myTurnIdx,firstMove);
-    getPreview(r,c)?.forEach(([pr,pc])=>{
-      if(pr<0||pr>=BS||pc<0||pc>=BS) return;
-      if(gameState.board[pr][pc]===0) cellEl(pr,pc).style.background=valid?'rgba(255,255,255,0.22)':'rgba(255,50,50,0.3)';
-    });
-  }
-}
-
-async function onCellClick(e){
+async function dropAt(x,y){
   if(!selPiece||!gameState||isProcessing) return;
   const myTurnIdx=getMyTurnIdx();
   if(gameState.currentTurnIdx!==myTurnIdx||gameState.passed[myTurnIdx]) return;
-  const r=+e.target.dataset.r,c=+e.target.dataset.c;
+  const [r,c]=getBoardCellAt(x,y);
+  if(r<0||r>=BS||c<0||c>=BS) return;
   const firstMove=gameState.pieces[myTurnIdx].every(p=>!p.used);
   if(!isValidPlacement(gameState.board,selPiece.shape,r,c,myTurnIdx,firstMove)) return;
+  await placePiece(r,c);
+}
 
+// ── MOUSE HOVER (desktop) ─────────────────────────────────────────────────────
+document.getElementById('board').addEventListener('mouseover',e=>{
+  const cell=e.target.closest('.cell');
+  if(!cell||!selPiece||!gameState) return;
+  const r=+cell.dataset.r,c=+cell.dataset.c;
+  clearBoardPreview();
+  const myTurnIdx=getMyTurnIdx();
+  if(gameState.currentTurnIdx!==myTurnIdx) return;
+  const firstMove=gameState.pieces[myTurnIdx].every(p=>!p.used);
+  const valid=isValidPlacement(gameState.board,selPiece.shape,r,c,myTurnIdx,firstMove);
+  selPiece.shape.forEach(([dr,dc])=>{
+    const tr=r+dr,tc=c+dc;
+    if(tr<0||tr>=BS||tc<0||tc>=BS) return;
+    if(gameState.board[tr][tc]===0)
+      cellEl(tr,tc).style.background=valid?'rgba(255,255,255,0.22)':'rgba(255,50,50,0.3)';
+  });
+  lastPreviewRC=[r,c];
+});
+
+document.getElementById('board').addEventListener('mouseleave',()=>clearBoardPreview());
+
+document.getElementById('board').addEventListener('click',async e=>{
+  const cell=e.target.closest('.cell');
+  if(!cell||!selPiece||!gameState||isProcessing) return;
+  const myTurnIdx=getMyTurnIdx();
+  if(gameState.currentTurnIdx!==myTurnIdx||gameState.passed[myTurnIdx]) return;
+  const r=+cell.dataset.r,c=+cell.dataset.c;
+  const firstMove=gameState.pieces[myTurnIdx].every(p=>!p.used);
+  if(!isValidPlacement(gameState.board,selPiece.shape,r,c,myTurnIdx,firstMove)) return;
+  await placePiece(r,c);
+});
+
+async function placePiece(r,c){
   isProcessing=true;
-  touchPreviewCell=null;
+  const myTurnIdx=getMyTurnIdx();
   try{
     const newBoard=gameState.board.map(row=>[...row]);
     selPiece.shape.forEach(([dr,dc])=>{newBoard[r+dr][c+dc]=myTurnIdx+1;});
     const newPieces=gameState.pieces.map((pp,ti)=>
       ti===myTurnIdx?pp.map((p,i)=>i===selPiece.pieceIdx?{...p,used:true}:p):pp
     );
-
     const newPassed=[...gameState.passed];
-    let next=(myTurnIdx+1)%gameState.order.filter(s=>s>=0).length;
-    let tries=0;
     const activeCount=gameState.order.filter(s=>s>=0).length;
+    let next=(myTurnIdx+1)%activeCount,tries=0;
     while(tries<activeCount){
-      if(!newPassed[next]){if(canMove(newBoard,newPieces,next)) break; newPassed[next]=true;}
-      next=(next+1)%activeCount; tries++;
+      if(!newPassed[next]){if(canMove(newBoard,newPieces,next)) break;newPassed[next]=true;}
+      next=(next+1)%activeCount;tries++;
     }
     const ended=newPassed.slice(0,activeCount).every(Boolean)||tries>=activeCount;
-
     await set(ref(db,`states/${roomId}`),{
       board:flattenBoard(newBoard),
       pieces:serializePieces(newPieces),
       currentTurnIdx:ended?gameState.currentTurnIdx:next,
-      passed:newPassed,
-      ended,
+      passed:newPassed,ended,
       order:gameState.order
     });
-    selPiece=null;hoverCell=null;
+    selPiece=null;lastPreviewRC=null;
   }finally{isProcessing=false;}
 }
 
-window.doRotate=()=>{if(!selPiece) return;selPiece.shape=rotateSh(selPiece.shape);renderMyTray(gameState.pieces,getMyTurnIdx(),true);}
-window.doFlip=()=>{if(!selPiece) return;selPiece.shape=flipSh(selPiece.shape);renderMyTray(gameState.pieces,getMyTurnIdx(),true);}
+window.doRotate=()=>{
+  if(!selPiece) return;
+  selPiece.shape=rotateSh(selPiece.shape);
+  clearBoardPreview();lastPreviewRC=null;
+  renderMyTray(gameState.pieces,getMyTurnIdx(),true);
+}
+window.doFlip=()=>{
+  if(!selPiece) return;
+  selPiece.shape=flipSh(selPiece.shape);
+  clearBoardPreview();lastPreviewRC=null;
+  renderMyTray(gameState.pieces,getMyTurnIdx(),true);
+}
 
 window.doSkip=async()=>{
   if(!gameState||isProcessing) return;
