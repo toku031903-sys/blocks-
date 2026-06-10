@@ -3,13 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
 <meta property="og:type" content="website">
 <meta property="og:title" content="ブロックス">
 <meta property="og:description" content="2〜4人で遊べるボードゲーム">
 <meta property="og:image" content="https://toku031903-sys.github.io/blocks-/IMG_0777.jpeg">
 <meta property="og:url" content="https://toku031903-sys.github.io/blocks-/">
-
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="ブロックス">
 <meta name="twitter:description" content="2〜4人で遊べるボードゲーム">
@@ -609,9 +607,10 @@ function buildPieceMini(pi,p,color,isMyTurn){
   div.appendChild(svg);
 
   if(isMyTurn&&!p.used){
-    // Tap to select
+    // Tap to select — keep rotated/flipped shape if already selected
     div.addEventListener('click',()=>{
-      selPiece=(selPiece&&selPiece.pieceIdx===pi)?null:{pieceIdx:pi,shape:deepCopy(p.shape)};
+      if(selPiece&&selPiece.pieceIdx===pi){ selPiece=null; }
+      else { selPiece={pieceIdx:pi,shape:deepCopy(p.shape)}; }
       renderMyTray(gameState.pieces,getMyTurnIdx(),true);
     });
     // Drag to place
@@ -645,8 +644,10 @@ let dragPi=null,dragShape=null,dragColor=null;
 function setupDrag(div,pi,p,color,CELL){
   div.addEventListener('touchstart',e=>{
     e.stopPropagation();
-    // select piece on touch start
-    selPiece={pieceIdx:pi,shape:deepCopy(p.shape)};
+    // Preserve rotated/flipped shape if already selected, else start fresh
+    if(!selPiece||selPiece.pieceIdx!==pi){
+      selPiece={pieceIdx:pi,shape:deepCopy(p.shape)};
+    }
     dragPi=pi;dragShape=selPiece.shape;dragColor=color;
     renderMyTray(gameState.pieces,getMyTurnIdx(),true);
     showGhost(e.touches[0].clientX,e.touches[0].clientY);
@@ -675,7 +676,10 @@ function showGhost(x,y){
   ghost.appendChild(svg);
   ghost.style.display='block';
   ghost.style.left=x+'px';
-  ghost.style.top=y+'px';
+  // Offset upward so piece appears above finger
+  const CELL2=getCellSize();
+  const shapeRows=Math.max(...selPiece.shape.map(c=>c[0]))+1;
+  ghost.style.top=(y - shapeRows*CELL2 - 30)+'px';
 }
 
 function getBoardCellAt(x,y){
